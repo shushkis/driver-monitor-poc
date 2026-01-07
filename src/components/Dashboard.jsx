@@ -1,0 +1,60 @@
+import { Gauge, Activity, EyeOff, AlertTriangle } from 'lucide-react'
+import { cn } from '../lib/utils'
+
+function MetricCard({ title, value, unit, icon: Icon, alert, color }) {
+    return (
+        <div className={cn(
+            "p-4 rounded-xl border bg-card text-card-foreground shadow-sm flex flex-col",
+            alert ? "border-red-500/50 bg-red-500/10" : "border-zinc-800 bg-zinc-900"
+        )}>
+            <div className="flex items-center justify-between mb-2">
+                <span className="text-zinc-400 text-sm font-medium">{title}</span>
+                <Icon className={cn("w-4 h-4", color)} />
+            </div>
+            <div className="flex items-baseline gap-1">
+                <span className="text-3xl font-bold tracking-tighter">{value}</span>
+                {unit && <span className="text-zinc-500 text-sm">{unit}</span>}
+            </div>
+        </div>
+    )
+}
+
+export function Dashboard({ metrics, isRunning }) {
+    return (
+        <div className="grid grid-cols-2 gap-3">
+            <div className="col-span-2">
+                <MetricCard
+                    title="Current Speed"
+                    value={Math.round(metrics.speed)}
+                    unit="km/h"
+                    icon={Gauge}
+                    color="text-blue-400"
+                    alert={metrics.speed > 50}
+                />
+            </div>
+
+            <MetricCard
+                title="Max Speed Events"
+                value={metrics.maxSpeedExceededCount}
+                icon={AlertTriangle}
+                color="text-orange-400"
+            />
+
+            <MetricCard
+                title="Harsh Turns/Jerks"
+                value={metrics.jerkCount}
+                icon={Activity}
+                color="text-yellow-400"
+            />
+
+            <div className="col-span-2">
+                <MetricCard
+                    title="Phone Distractions"
+                    value={metrics.distractionCount}
+                    icon={EyeOff}
+                    color="text-purple-400"
+                />
+            </div>
+        </div>
+    )
+}
