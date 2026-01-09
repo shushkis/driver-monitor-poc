@@ -75,6 +75,7 @@ function App() {
   }
 
   const downloadLogs = () => {
+    return
     if (events.length === 0) return
 
     const header = "Timestamp,Type,Speed,Lat,Lng,Value\n"
