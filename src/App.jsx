@@ -1,13 +1,16 @@
 import { useState, useRef, useEffect } from 'react'
 import { Dashboard } from './components/Dashboard'
+import { RewardPopup } from './components/RewardPopup'
 import { useGeoLocation } from './hooks/useGeoLocation'
 import { useMotionSensors } from './hooks/useMotionSensors'
 import { useFaceTracker } from './hooks/useFaceTracker'
 import { format } from 'date-fns'
+import logo from './assets/logo.png'
 
 function App() {
   const [isRunning, setIsRunning] = useState(false)
   const [events, setEvents] = useState([])
+  const [reward, setReward] = useState(null)
   const videoRef = useRef(null)
 
   // Central Event Logger
@@ -27,8 +30,8 @@ function App() {
 
   // Sensors
   const { speed, coordinates, maxSpeedExceededCount } = useGeoLocation(isRunning, handleEvent)
-  const { jerkCount, requestPermission, permissionGranted } = useMotionSensors(isRunning, handleEvent)
-  const { distractionCount, isLoaded: messageLoaded } = useFaceTracker(isRunning, videoRef, handleEvent)
+  const { jerkCount, turnCount, bumpCount, requestPermission, permissionGranted } = useMotionSensors(isRunning, handleEvent)
+  const { distractionCount, isLoaded: messageLoaded, debugInfo } = useFaceTracker(isRunning, videoRef, handleEvent)
 
   const toggleMonitoring = async () => {
     if (!isRunning) {
@@ -48,6 +51,7 @@ function App() {
         }
         setIsRunning(true)
         setEvents([]) // Clear logs on start? or keep appending? Let's clear.
+        setReward(null)
       } catch (e) {
         alert("Camera access failed: " + e.message)
         console.error(e)
@@ -60,6 +64,10 @@ function App() {
         videoRef.current.srcObject.getTracks().forEach(track => track.stop())
         videoRef.current.srcObject = null
       }
+
+      // Generate Rewards
+      const earnedCoins = Math.floor(Math.random() * 90) + 10 // 10 to 100 coins
+      setReward({ coins: earnedCoins })
 
       // Export Data
       downloadLogs()
@@ -89,13 +97,15 @@ function App() {
     speed,
     maxSpeedExceededCount,
     jerkCount,
+    turnCount,
+    bumpCount,
     distractionCount
   }
 
   return (
     <div className="fixed inset-0 bg-zinc-950 text-white flex flex-col font-sans">
       <header className="p-4 border-b border-zinc-800 flex justify-between items-center bg-zinc-900/50 backdrop-blur-md z-10 shrink-0">
-        <h1 className="text-xl font-bold tracking-tight text-blue-400">DriverMon</h1>
+        <img src={logo} alt="GoodWheel.world" className="h-8 object-contain" />
         <div className="flex gap-2 items-center">
           <div className={`w-3 h-3 rounded-full ${isRunning ? 'bg-red-500 animate-pulse' : 'bg-gray-500'}`} />
           <span className="text-xs text-gray-400 font-mono uppercase">{isRunning ? 'REC' : 'IDLE'}</span>
@@ -130,19 +140,32 @@ function App() {
           Events Logged: {events.length}
         </div>
 
+        {isRunning && (
+          <div className="text-[10px] text-zinc-700 font-mono mt-1">
+            CV Debug: {debugInfo || "Loading model..."}
+          </div>
+        )}
+
       </main>
 
       <footer className="p-4 bg-zinc-900/80 backdrop-blur border-t border-zinc-800 pb-8 shrink-0">
         <button
           onClick={toggleMonitoring}
           className={`w-full py-4 rounded-xl font-bold text-lg transition-all active:scale-95 shadow-lg ${isRunning
-              ? 'bg-red-500/10 text-red-500 border border-red-500/50 hover:bg-red-500/20'
-              : 'bg-blue-500 text-white hover:bg-blue-400 shadow-blue-500/20'
+            ? 'bg-red-500/10 text-red-500 border border-red-500/50 hover:bg-red-500/20'
+            : 'bg-[#34D399] text-zinc-950 hover:bg-[#2cc18b] shadow-[#34D399]/20'
             }`}
         >
           {isRunning ? 'Stop Monitoring' : 'Start Monitoring'}
         </button>
       </footer>
+
+      {reward && (
+        <RewardPopup
+          coins={reward.coins}
+          onClose={() => setReward(null)}
+        />
+      )}
     </div>
   )
 }

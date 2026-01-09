@@ -31,6 +31,20 @@ export const useFaceTracker = (isRunning, videoRef, onEvent) => {
         loadModel()
     }, [])
 
+    const [debugInfo, setDebugInfo] = useState("")
+
+    useEffect(() => {
+        if (isRunning && isLoaded && videoRef.current) {
+            requestRef.current = requestAnimationFrame(detect)
+        } else {
+            distractionFrames.current = 0
+            if (requestRef.current) cancelAnimationFrame(requestRef.current)
+        }
+        return () => {
+            if (requestRef.current) cancelAnimationFrame(requestRef.current)
+        }
+    }, [isRunning, isLoaded])
+
     const detect = () => {
         if (!faceLandmarkerRef.current || !videoRef.current) return
 
@@ -38,6 +52,11 @@ export const useFaceTracker = (isRunning, videoRef, onEvent) => {
         if (video.currentTime !== lastVideoTimeRef.current) {
             lastVideoTimeRef.current = video.currentTime
             const results = faceLandmarkerRef.current.detectForVideo(video, performance.now())
+
+            // Update debug info occasionally to avoid React render thrashing
+            if (performance.now() % 500 < 20) {
+                setDebugInfo(`Faces: ${results.faceLandmarks?.length || 0} | Shapes: ${results.faceBlendshapes?.[0]?.categories?.length || 0}`)
+            }
 
             if (results.faceLandmarks && results.faceLandmarks.length > 0) {
                 // Check if Looking AT camera (Distraction)
@@ -58,17 +77,5 @@ export const useFaceTracker = (isRunning, videoRef, onEvent) => {
         requestRef.current = requestAnimationFrame(detect)
     }
 
-    useEffect(() => {
-        if (isRunning && isLoaded && videoRef.current) {
-            requestRef.current = requestAnimationFrame(detect)
-        } else {
-            distractionFrames.current = 0
-            if (requestRef.current) cancelAnimationFrame(requestRef.current)
-        }
-        return () => {
-            if (requestRef.current) cancelAnimationFrame(requestRef.current)
-        }
-    }, [isRunning, isLoaded])
-
-    return { distractionCount, isLoaded }
+    return { distractionCount, isLoaded, debugInfo }
 }

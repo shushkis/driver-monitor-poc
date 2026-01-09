@@ -1,4 +1,4 @@
-import { Gauge, Activity, EyeOff, AlertTriangle } from 'lucide-react'
+import { Gauge, Activity, EyeOff, AlertTriangle, RotateCw } from 'lucide-react'
 import { cn } from '../lib/utils'
 
 function MetricCard({ title, value, unit, icon: Icon, alert, color }) {
@@ -41,10 +41,24 @@ export function Dashboard({ metrics, isRunning }) {
             />
 
             <MetricCard
-                title="Harsh Turns/Jerks"
+                title="Harsh Accel/Brake"
                 value={metrics.jerkCount}
                 icon={Activity}
                 color="text-yellow-400"
+            />
+
+            <MetricCard
+                title="Sharp Turns"
+                value={metrics.turnCount}
+                icon={RotateCw}
+                color="text-indigo-400"
+            />
+
+            <MetricCard
+                title="Potholes / Bumps"
+                value={metrics.bumpCount || 0}
+                icon={Activity}
+                color="text-red-400"
             />
 
             <div className="col-span-2">
