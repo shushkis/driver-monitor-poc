@@ -55,7 +55,7 @@ export function RewardPopup({ coins, onClose }) {
                     <div className="absolute inset-0 bg-emerald-500/5 group-hover:bg-emerald-500/10 transition-colors" />
                     <span className="text-zinc-500 text-xs font-mono uppercase tracking-wider block mb-1">Earned</span>
                     <div className="text-4xl font-bold text-emerald-400 tracking-tighter flex items-center justify-center gap-2">
-                        +{coins} <span className="text-lg text-emerald-500/50">GC</span>
+                        +{coins} <span className="text-lg text-emerald-500/50">Coins</span>
                     </div>
                 </div>
 

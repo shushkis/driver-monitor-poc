@@ -55,7 +55,7 @@ export function Dashboard({ metrics, isRunning }) {
             />
 
             <MetricCard
-                title="Potholes / Bumps"
+                title="Potholes/Bumps"
                 value={metrics.bumpCount || 0}
                 icon={Activity}
                 color="text-red-400"
@@ -63,7 +63,7 @@ export function Dashboard({ metrics, isRunning }) {
 
             <div className="col-span-2">
                 <MetricCard
-                    title="Phone Distractions"
+                    title="Driver Distractions"
                     value={metrics.distractionCount}
                     icon={EyeOff}
                     color="text-purple-400"

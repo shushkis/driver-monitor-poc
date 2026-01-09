@@ -4,6 +4,7 @@ import { FaceLandmarker, FilesetResolver } from '@mediapipe/tasks-vision'
 export const useFaceTracker = (isRunning, videoRef, onEvent) => {
     const [distractionCount, setDistractionCount] = useState(0)
     const [isLoaded, setIsLoaded] = useState(false)
+    const [debugInfo, setDebugInfo] = useState("Loading model...")
 
     const faceLandmarkerRef = useRef(null)
     const lastVideoTimeRef = useRef(-1)
@@ -14,36 +15,28 @@ export const useFaceTracker = (isRunning, videoRef, onEvent) => {
 
     useEffect(() => {
         const loadModel = async () => {
-            const filesetResolver = await FilesetResolver.forVisionTasks(
-                "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm"
-            )
-            faceLandmarkerRef.current = await FaceLandmarker.createFromOptions(filesetResolver, {
-                baseOptions: {
-                    modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task`,
-                    delegate: "GPU"
-                },
-                outputFaceBlendshapes: true,
-                runningMode: "VIDEO",
-                numFaces: 1
-            })
-            setIsLoaded(true)
+            try {
+                const filesetResolver = await FilesetResolver.forVisionTasks(
+                    "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm"
+                )
+                faceLandmarkerRef.current = await FaceLandmarker.createFromOptions(filesetResolver, {
+                    baseOptions: {
+                        modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task`,
+                        delegate: "GPU"
+                    },
+                    outputFaceBlendshapes: true,
+                    runningMode: "VIDEO",
+                    numFaces: 1
+                })
+                setIsLoaded(true)
+                setDebugInfo("Model Loaded")
+            } catch (e) {
+                console.error(e)
+                setDebugInfo(`Load Error: ${e.message}`)
+            }
         }
         loadModel()
     }, [])
-
-    const [debugInfo, setDebugInfo] = useState("")
-
-    useEffect(() => {
-        if (isRunning && isLoaded && videoRef.current) {
-            requestRef.current = requestAnimationFrame(detect)
-        } else {
-            distractionFrames.current = 0
-            if (requestRef.current) cancelAnimationFrame(requestRef.current)
-        }
-        return () => {
-            if (requestRef.current) cancelAnimationFrame(requestRef.current)
-        }
-    }, [isRunning, isLoaded])
 
     const detect = () => {
         if (!faceLandmarkerRef.current || !videoRef.current) return
@@ -76,6 +69,18 @@ export const useFaceTracker = (isRunning, videoRef, onEvent) => {
 
         requestRef.current = requestAnimationFrame(detect)
     }
+
+    useEffect(() => {
+        if (isRunning && isLoaded && videoRef.current) {
+            requestRef.current = requestAnimationFrame(detect)
+        } else {
+            distractionFrames.current = 0
+            if (requestRef.current) cancelAnimationFrame(requestRef.current)
+        }
+        return () => {
+            if (requestRef.current) cancelAnimationFrame(requestRef.current)
+        }
+    }, [isRunning, isLoaded])
 
     return { distractionCount, isLoaded, debugInfo }
 }
