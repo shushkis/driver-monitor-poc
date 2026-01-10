@@ -7,8 +7,8 @@ export const useMotionSensors = (isRunning, onEvent) => {
     const [permissionGranted, setPermissionGranted] = useState(false)
 
     const ACCEL_THRESHOLD = 3 // m/s^2 (Hard braking/accel)
-    const BUMP_THRESHOLD = 10 // m/s^2 (Potholes, Speed bumps)
-    const TURN_THRESHOLD = 60 // deg/s
+    const BUMP_THRESHOLD = 3 // m/s^2 (Potholes, Speed bumps)
+    const TURN_THRESHOLD = 30 // deg/s
 
     const lastEventTime = useRef(0)
     const COOLDOWN_MS = 2000
@@ -78,7 +78,7 @@ export const useMotionSensors = (isRunning, onEvent) => {
             if (now - lastEventTime.current > COOLDOWN_MS) {
                 // Check Bumps (Vertical Shock)
                 // Bumps are usually sharp vertical spikes
-                if (verticalAccel > 8) { // Lowered threshold for vertical shock
+                if (verticalAccel > BUMP_THRESHOLD) { // Lowered threshold for vertical shock
                     setBumpCount(prev => prev + 1)
                     lastEventTime.current = now
                     onEvent('POTHOLE_BUMP', { value: verticalAccel.toFixed(1) })

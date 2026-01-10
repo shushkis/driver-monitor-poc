@@ -7,7 +7,7 @@ export const useGeoLocation = (isRunning, onEvent) => {
     const [maxSpeedExceededCount, setMaxSpeedCount] = useState(0)
 
     // Config
-    const SPEED_LIMIT = 50 // km/h
+    const SPEED_LIMIT = 30 // km/h
     const COOLDOWN_SECONDS = 10
 
     const lastSpeedEventTime = useRef(0)

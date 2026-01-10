@@ -4,16 +4,16 @@ import { cn } from '../lib/utils'
 function MetricCard({ title, value, unit, icon: Icon, alert, color }) {
     return (
         <div className={cn(
-            "p-4 rounded-xl border bg-card text-card-foreground shadow-sm flex flex-col",
+            "p-2.5 rounded-lg border bg-card text-card-foreground shadow-sm flex flex-col",
             alert ? "border-red-500/50 bg-red-500/10" : "border-zinc-800 bg-zinc-900"
         )}>
-            <div className="flex items-center justify-between mb-2">
-                <span className="text-zinc-400 text-sm font-medium">{title}</span>
-                <Icon className={cn("w-4 h-4", color)} />
+            <div className="flex items-center justify-between mb-1">
+                <span className="text-zinc-400 text-xs font-medium">{title}</span>
+                <Icon className={cn("w-3.5 h-3.5", color)} />
             </div>
             <div className="flex items-baseline gap-1">
-                <span className="text-3xl font-bold tracking-tighter">{value}</span>
-                {unit && <span className="text-zinc-500 text-sm">{unit}</span>}
+                <span className="text-2xl font-bold tracking-tighter">{value}</span>
+                {unit && <span className="text-zinc-500 text-xs">{unit}</span>}
             </div>
         </div>
     )
@@ -21,7 +21,7 @@ function MetricCard({ title, value, unit, icon: Icon, alert, color }) {
 
 export function Dashboard({ metrics, isRunning }) {
     return (
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-2 shrink-0">
             <div className="col-span-2">
                 <MetricCard
                     title="Current Speed"
