@@ -11,7 +11,11 @@ export const useFaceTracker = (isRunning, videoRef, onEvent) => {
     const requestRef = useRef(null)
 
     const distractionFrames = useRef(0)
-    const DISTRACTION_THRESHOLD_FRAMES = 30
+    const DISTRACTION_THRESHOLD_FRAMES = 45
+
+    // FPS tracking
+    const lastFrameTimeRef = useRef(performance.now())
+    const fpsRef = useRef(0)
 
     useEffect(() => {
         const loadModel = async () => {
@@ -46,9 +50,17 @@ export const useFaceTracker = (isRunning, videoRef, onEvent) => {
             lastVideoTimeRef.current = video.currentTime
             const results = faceLandmarkerRef.current.detectForVideo(video, performance.now())
 
+            // Calculate FPS
+            const now = performance.now()
+            const deltaTime = now - lastFrameTimeRef.current
+            if (deltaTime > 0) {
+                fpsRef.current = Math.round(1000 / deltaTime)
+            }
+            lastFrameTimeRef.current = now
+
             // Update debug info occasionally to avoid React render thrashing
             if (performance.now() % 500 < 20) {
-                setDebugInfo(`Faces: ${results.faceLandmarks?.length || 0} | Shapes: ${results.faceBlendshapes?.[0]?.categories?.length || 0}`)
+                setDebugInfo(`FPS: ${fpsRef.current} | Faces: ${results.faceLandmarks?.length || 0} | Shapes: ${results.faceBlendshapes?.[0]?.categories?.length || 0}`)
             }
 
             if (results.faceLandmarks && results.faceLandmarks.length > 0) {

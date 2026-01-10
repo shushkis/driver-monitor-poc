@@ -55,7 +55,7 @@ export function Dashboard({ metrics, isRunning }) {
             />
 
             <MetricCard
-                title="Potholes/Bumps"
+                title="Potholes/Speed bumps"
                 value={metrics.bumpCount || 0}
                 icon={Activity}
                 color="text-red-400"

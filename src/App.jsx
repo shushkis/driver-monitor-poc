@@ -120,7 +120,7 @@ function App() {
         <div className="rounded-xl overflow-hidden bg-black aspect-[3/4] relative border border-zinc-800 shadow-2xl mx-auto w-full max-w-[160px] mt-2 shrink-0">
           <video
             ref={videoRef}
-            className="w-full h-full object-cover mirror"
+            className="w-full h-full object-cover"
             muted
             playsInline
           />
