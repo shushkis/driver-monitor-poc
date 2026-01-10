@@ -6,7 +6,7 @@ export const useMotionSensors = (isRunning, onEvent) => {
     const [bumpCount, setBumpCount] = useState(0)
     const [permissionGranted, setPermissionGranted] = useState(false)
 
-    const ACCEL_THRESHOLD = 5 // m/s^2 (Hard braking/accel)
+    const ACCEL_THRESHOLD = 3 // m/s^2 (Hard braking/accel)
     const BUMP_THRESHOLD = 10 // m/s^2 (Potholes, Speed bumps)
     const TURN_THRESHOLD = 60 // deg/s
 
